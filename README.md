@@ -7,18 +7,18 @@ dungeon_gen_1
 		1. generate a bunch of rooms  
 		2. connect them all somehow  
 
-  ideas that were implemented:  
-		- generate 2d array of the world  
-		- generate rectangular rooms  
-		- rooms have random height and width  
-		- if a room overlaps with another room, it erases that new room and tries again. it considers that a fail  
-		- after so many fails, the script ends  
-		- you can specify a limit to how many rooms to make  
-		- if a room is successfully placed, add its coordinates to an array  
-		- rooms can have an adjustable gap between them  
+  ideas that were implemented:
+     - generate 2d array of the world  
+     - generate rectangular rooms  
+     - rooms have random height and width  
+     - if a room overlaps with another room, it erases that new room and tries again. it considers that a fail  
+     - after so many fails, the script ends  
+     - you can specify a limit to how many rooms to make  
+     - if a room is successfully placed, add its coordinates to an array  
+     - rooms can have an adjustable gap between them  
   
-	ideas that i couldn't implement:  
-		- the hallway generation algorithm i came up, i couldn't translate it from paper.  
+ideas that i couldn't implement: 
+	- the hallway generation algorithm i came up, i couldn't translate it from paper.  
 			you have a list of points of the rooms which get successively paired/connected.  
 			phase 1 connects 1 room to its closest room, they form a pair.  
 			you do this for all unpaired rooms.  
