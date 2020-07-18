@@ -1,8 +1,8 @@
 dungeon_gen_3
 
 basic idea:
-	quickly add a connection_distance_max check into dungeon_gen_2 when placing rooms
-	this was supposed to make the map more dense and have less hallways 
+	- quickly add a connection_distance_max check into dungeon_gen_2 when placing rooms
+	- this was supposed to make the map more dense and have less hallways 
 	
 result:
 	- the map isn't any denser and the hallways are more or less the same.
