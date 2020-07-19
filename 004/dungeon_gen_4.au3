@@ -14,7 +14,6 @@ const  $rooms_max = 100				;max amount of rooms that can be placed
 global $rooms_fail_count = 0			;current amount of fails at placing a room
 const  $rooms_fail_max = 50			;max amount of fails before we stop trying to make new rooms
 const  $connection_distance_max = 15	;max distance between a new room and the next closest room
-
 const $tile_empty = "0"
 const $tile_wall = "100"
 const $tile_hall = "200"
