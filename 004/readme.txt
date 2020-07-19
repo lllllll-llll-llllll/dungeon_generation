@@ -7,7 +7,7 @@ basic idea:
 
 result:
   - it had strange output initially, to see what i mean
-    you can check the images in this folder.
+    you can check the 4-1, 4-2, etc images prior to 4.1
   - i must have had lots of things implemented incorrectly
     but gradually everything was fixed.
   - 4.1 will generate a bunch of rooms that are always connected
