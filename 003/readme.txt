@@ -30,7 +30,7 @@ correction:
 		$b = Abs($d3 - $d4)	; x dif	
 		
 result:
-	- the "\" diagonal distribution or rooms has disappeared.
+	- the "\" diagonal distribution of rooms has disappeared.
 	- rooms are still not connecting
 	- i believe the rooms arrays aren't getting cleansed upon a failure,
 	  which leads to future rooms pairing up with these ghsot rooms,
