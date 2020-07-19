@@ -35,6 +35,7 @@ result:
 	- i believe the rooms arrays aren't getting cleansed upon a failure,
 	  which leads to future rooms pairing up with these ghsot rooms,
 	  rooms that don't exist on the map, but exist within the point arrays
+	- output is interesting
 	  
 what i learned:
 	- well the distance formula for gen4 is now fixed, so that's nice
