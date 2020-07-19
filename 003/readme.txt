@@ -39,3 +39,15 @@ result:
 	  
 what i learned:
 	- well the distance formula for gen4 is now fixed, so that's nice
+
+
+
+
+
+
+
+
+
+
+
+
