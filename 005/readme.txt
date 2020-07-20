@@ -7,7 +7,7 @@ basic idea:
     which lets you look at the bitmap in any text editor or from github
 
 problems:
-  - line 167 causes program to fail sometimes
+  - line 167 causes program to fail sometimes ($world[yy][xx] is wrong?)
   - also some rooms aren't connecting now. something broke betwen 4 and 5
   - takes forever. can start optimizing it
   
