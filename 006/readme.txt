@@ -14,7 +14,6 @@ dungeon gen 6
   <newline>   ; spacing between prefabs
   
   5 being the width, 4 being the height
-  so rooms that randomly picked this prefab will be sized 5x4
   . being nothing
   1 bieng floor space tiles denoting the regions of a room
   0 being floor space tiles that also denote potential connection points between other rooms
