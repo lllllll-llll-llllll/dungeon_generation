@@ -1,6 +1,8 @@
 dungeon gen 6
 
-  the basic approach for this will be same as before, we will generate a randomly sized room, then draw a hallway to connect it to the closest room/point, then repeat. however, the size/shape/contents of each room will be determined by text bitmap prefabs for this.
+  the basic approach for this will be same as before, we will generate a randomly sized room,
+  then draw a hallway to connect it to the closest room/point, then repeat. however, the
+  size/shape/contents of each room will be determined by text bitmap prefabs for this.
   
   prefabs will look like this:
   
@@ -19,7 +21,8 @@ dungeon gen 6
   
   these prefabs will be stored in a text file, prefabs.txt
   
-  the program will check this prefabs.txt and build up a list of possible rooms by storing their line positions in the text file.
+  the program will check this prefabs.txt and build up a list of possible rooms by storing
+  their line positions in the text file.
   example of how program will work:
   array prefabs = [1, 10, 17, 23, 30, 39, 52]
   this lets us rand(0, ubound(prefab)) to pick a room
@@ -28,7 +31,8 @@ dungeon gen 6
   we immediately land on the room dimensions.
   we check the world if we have enough space to place the prefab.
   if a collision occurs we fail and try again
-  if no collision occurs we once again iterate through world and place tiles according to what is in the prefab
+  if no collision occurs we once again iterate through world and place tiles according to what
+  is in the prefab
   after this, we attempt to draw a hallway connecting our room with another room/point
   if we can't or something, we fail and try again
   we do this until we have placed enough rooms
