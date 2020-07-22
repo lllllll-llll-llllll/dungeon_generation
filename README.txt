@@ -6,5 +6,5 @@ the only things worth checking out are probably just the output pictures, and pe
 species:
 a: 1--2--3--3.1
        \
-        4--4.1--5
-b: 6
+     b: 4--4.1--5
+c: 6
