@@ -1,6 +1,6 @@
 dungeon gen 6
 
-  the basic approach for this will be same as before, we will generate randomly sized rooms, then draw hallways to connect them together, however the size/shape/contents of each room will be determined by text bitmap prefabs.
+  the basic approach for this will be same as before, we will generate a randomly sized room, then draw a hallway to connect it to the closest room/point, then repeat. however, the size/shape/contents of each room will be determined by text bitmap prefabs for this.
   
   prefabs will look like this:
   
