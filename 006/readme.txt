@@ -1,50 +1,5 @@
 dungeon gen 6
 
-  the basic approach for this will be same as before, we will generate a randomly sized room,
-  then draw a hallway to connect it to the closest room/point, then repeat. however, the
-  size/shape/contents of each room will be determined by text bitmap prefabs for this.
-  
-  prefabs will look like this:
-  
-  5x4         ; dimensions
-  . 1 0 1 .   ; room contents
-  0 1 1 1 0   ; ...
-  1 1 1 1 1   ; ...
-  . 1 0 1 .   ; ...
-  <newline>   ; spacing between prefabs
-  
-  5 being the width, 4 being the height
-  . being nothing
-  1 bieng floor space tiles denoting the regions of a room
-  0 being floor space tiles that also denote potential connection points between other rooms
-  
-  these prefabs will be stored in a text file, prefabs.txt
-  
-  the program will check this prefabs.txt and build up a list of possible rooms by storing
-  their line positions in the text file.
-  example of how program will work:
-  array prefabs = [1, 10, 17, 23, 30, 39, 52]
-  this lets us rand(0, ubound(prefab)) to pick a room
-  say we get 2.
-  prefabs[2] tells us to go to line 17 in prefabs.txt
-  we immediately land on the room dimensions.
-  we check the world if we have enough space to place the prefab.
-  if a collision occurs we fail and try again
-  if no collision occurs we once again iterate through world and place tiles according to what
-  is in the prefab
-  after this, we attempt to draw a hallway connecting our room with another room/point
-  if we can't or something, we fail and try again
-  we do this until we have placed enough rooms
-  
-  probably it will be easiest to do simple prefabs first just to figure how this works
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+this uses the same approach as the previous, but it was largely rewritten. instead of randomly sized rooms, we have a variety of prefabs that we create ourselves stores in prefabs.txt which it will draw as rooms for us. the rooms contain height/width info, and each space is either empty, floor, or a door. so we pick a random prefab, place it, and ake connections between the doors of the nearest room, then repeat until we fail enough times or reach the room limit
+
+it produces interesting output. it is cool to see little buildings i have created get placed down. i will need to add in the minimum distance check so rooms arent placed too far apart. sometimes the rooms create islands and don't connect. i plan on visually stepping through the process and looking at output from each step to see how and why this occurs, the method for producing output from each step was created previously so i can modify that
