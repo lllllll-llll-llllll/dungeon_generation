@@ -1,84 +1,24 @@
-#cs
-declare variables
-   everything we need goes here?
-
-world_prep()
-   open prefabs.txt
-   iterate through it until you find dimensions
-   add dimensions line number to an array
-
-
-room_select()
-   room_no = random(0 through ubound(prefabs))
-   room_x = leftmost position
-   room_y = upmost position
-
-
-room_check()
-   go to line number $room_no of $prefabs
-   room_Width = first stringplit string
-   room_height = second stringsplit string
-   slice_loop:
-	  advance a line, set that to room slice
-	  stringsplit room_slice using " " empty space
-   iterate through y
-	  slice_loop?
-   iterate through x
-	  check the spaces in room_slice array to make sure we have enough room to place the room
-	  if any collisions occur, consider it a fail
-
-
-room_build()
-   iterate through it again, placing tiles into the world.
-   since we checked and verified there was no collision this should be simple.
-
-
-connection_find()
-   get the connection points of our room stored in an array.
-	  we can build this array from the previous step when we are checking.
-	  when we encounter chars of "0" or whatever denotes a 'door', we can just add it to an array
-   for each of our connection points in this room, find the closest other point in the world
-	  best_this?
-	  best_other?
-		 these show which points we are going to use to build a connection between the two rooms
-
-
-connection_build()
-   we find which direction we need to start building a hallway
-   whichever direction is the longest we will do first
-   when we reach 50% of that direction, we will switch and do the other direction
-   it ends when the current points arent less than the goal points
-   perhaps at every corner or turn that we make, we can add these to the list of possible points to build upon
-	  this would help contribute visually to making it look more itneresting
-	  the dead end hallways would also be easier and cleaner to create if we had more ponts to connect to
-
-
-room_success()
-
-
-room_failure()
-
-
-dead end connection phase here...
-#ce
-
 #include <array.au3>
 
 ;constants
-global const $world_width  = 50
-global const $world_height = 50
+global const $world_width  = 300
+global const $world_height = 300
 global const $room_border = 1
-global const $room_count_max = 100
-global const $room_fail_count_max = 100
+global const $room_count_max = 1000
+global const $room_fail_count_max = 500
+global const $name = rand(0,99999)
+
+
+;debugging
+;global const $logpath = @ScriptDir & "\" & $name & ".txt"
+;global const $logfile = fileopen($logpath, 10)
+
 
 ;tiles
 global const $tile_empty = '0'
 global const $tile_floor = '1'
 global const $tile_door  = '2'
 global const $tile_hall  = '3'
-global const $tile_floor_trial = '4'
-global const $tile_door_trial  = '5'
-global const $tile_hall_trial  = '6'
 
 
 ;variables
@@ -92,9 +32,21 @@ global $room_x = null
 global $room_y = null
 global $room_x_end = null
 global $room_y_end = null
+global $room_x_center = null
+global $room_y_center = null
 global $room_count = 0
 global $room_fail_count = 0
 global $bad = false
+
+global $door_x = null
+global $door_y = null
+global $door_x_end = null
+global $door_y_end = null
+global $doors_x[0]
+global $doors_y[0]
+global $doors_x_end[0]
+global $doors_y_end[0]
+
 
 
 main()
@@ -105,13 +57,14 @@ func main()
 	  room_select()
 	  room_check()
 	  room_build()
-	  ;connection_find()
-	  ;connection_build()
+	  door_find()
+	  hall_build()
 	  room_success()
 	  room_fail()
    wend
 
-   print()
+   image()
+   ;print()
 
 endfunc
 
@@ -125,21 +78,22 @@ func world_prep()
    local $prefab_file = fileopen(@ScriptDir & "\prefabs.txt")
    $prefab = FileReadToArray($prefab_file)
 
-   for $line = 0 to ubound($prefab) - 1 step 1
+   for $line = 0 to (ubound($prefab) - 1) step 1
 	  local $string = $prefab[$line]
 	  if StringInStr($string, "x") then
 		 _ArrayAdd($prefab_positions, $line)
 	  endif
-   next ;line
+   next
 
-   ;_arraydisplay($prefab_positions)
+   fill("", $tile_empty)
 
 endfunc
 
 
 func room_select()
    if $bad then return
-
+   global $doors_x[0]
+   global $doors_y[0]
    $room_no = rand(0, ubound($prefab_positions) - 1)
    local $dimensions = stringsplit($prefab[$prefab_positions[$room_no]], "x", 2)
    $room_width  = $dimensions[0]
@@ -148,47 +102,147 @@ func room_select()
    $room_y = rand($room_border, ($world_height - $room_height - $room_border))
    $room_x_end = $room_x + $room_width
    $room_y_end = $room_y + $room_height
+   $room_x_center = $room_x + floor($room_width / 2)
+   $room_y_center = $room_y + floor($room_height / 2)
 
 endfunc
 
-;this is failing atm and fucking everything up
-func room_check()	;iterate through $world, fail at non-empty
+func room_check()
    if $bad then return
 
-   for $y = $room_y to $room_y_end step 1
-   for $x = $room_x to $room_x_end step 1
+   for $y = ($room_y - $room_border) to ($room_y_end + $room_border - 1)
+   for $x = ($room_x - $room_border) to ($room_x_end + $room_border - 1)
 	  if $world[$y][$x] <> $tile_empty then
 		 $bad = true
-		 msgbox(1,"room_check fail","")
 		 return
 	  endif
+
    next
    next
 
 endfunc
 
 
-func room_build()	;iterate through $prefab, assign tile to $world
+func room_build()
    if $bad then return
    local $start = $prefab_positions[$room_no]
    local $tiles = null
+   local $doors_count = 0
 
-   for $y = 0 to $room_height - 1 step 1
+   for $y = 0 to ($room_height - 1)
 	  $tiles = $prefab[$start + $y + 1]
-	  msgbox(1,"tiles", $tiles)
 
-	  for $x = 0 to $room_width - 1 step 1
+	  for $x = 0 to ($room_width - 1)
 		 local $char = int(StringMid($tiles, $x + 1, 1))
-		 if $char > 0 then $world[$room_y + $y][$room_x + $x] = $char + 3
+		 if $char > 0 then $world[$room_y + $y][$room_x + $x] = $char
+
+		 if ($char = $tile_door) then ;add doors from this room being built
+			$doors_count += 1
+			_ArrayAdd($doors_x, $room_x + $x)
+			_ArrayAdd($doors_y, $room_y + $y)
+		 endif
+
 	  next
 
    next
+
+   if $doors_count < 1 then $bad = true
+
+endfunc
+
+
+func door_find()
+   if $bad then return
+   if $room_count < 1 then return
+   if $room_count = 1 then
+	  ;print()
+	  ;_arraydisplay($doors_x)
+	  $door_x_end = $doors_x_end[0]
+	  $door_y_end = $doors_y_end[0]
+	  return
+   endif
+
+   local $best_index = null
+   local $best = 999999999
+   local $dist = 999999999
+   for $i = 0 to (ubound($doors_x_end) - 1)		;	find the closest door to the center of this room
+	  $dist = distance($room_x_center, $doors_x_end[$i], $room_y_center, $doors_y_end[$i])
+	  if ($dist < $best) and ($dist > 0) then
+		 $best = $dist
+		 $best_index = $i
+	  endif
+   next
+   $door_y_end = $doors_y_end[$best_index]
+   $door_x_end = $doors_x_end[$best_index]
+
+
+   $best_index = null
+   $best = 999999999
+   $dist = 999999999
+   for $i = 0 to (ubound($doors_x) - 1)		;	find the closest door in this room to the door outside
+	  $dist = distance($door_x_end, $doors_x[$i], $door_y_end, $doors_y[$i])
+	  if ($dist < $best) and ($dist > 0) then
+		 $best = $dist
+		 $best_index = $i
+	  endif
+   next
+   $door_y = $doors_y[$best_index]
+   $door_x = $doors_x[$best_index]
+
+endfunc
+
+
+func hall_build()
+   if $bad then return
+   if $room_count < 1 then return
+   local $this_x = $door_x
+   local $this_y = $door_y
+
+   ;say($door_x)
+   ;say($this_x & @crlf & $door_x_end & @crlf & @crlf & $this_y & @crlf & $door_y_end)
+
+
+   while true
+	  if ($this_x < $door_x_end) then
+		 $this_x += 1
+
+	  elseif ($this_x > $door_x_end) then
+		 $this_x -= 1
+
+	  elseif ($this_y < $door_y_end) then
+		 $this_y += 1
+
+	  elseif ($this_y > $door_y_end) then
+		 $this_y -= 1
+
+	  else
+		 ;if ($this_y > 0) and ($this_x > 0) and ($this_y < $world_height - 1) and ($this_x < $world_width - 1) then
+			if ($world[$this_y][$this_x] = $tile_empty) then $world[$this_y][$this_x] = $tile_hall
+		 ;endif
+		 return
+	  endif
+
+	  ;if ($this_y > 0) and ($this_x > 0) and ($this_y < $world_height - 1) and ($this_x < $world_width - 1) then
+		 if ($world[$this_y][$this_x] = $tile_empty) then $world[$this_y][$this_x] = $tile_hall
+		 ;say("here")
+	  ;endif
+	  ;these checks caused a problem so they are commented out for now
+
+   wend
 
 endfunc
 
 
 func room_success()
    if $bad then return
+
+   for $x in $doors_x
+	  _ArrayAdd($doors_x_end, $x)
+   next
+
+   for $y in $doors_y
+	  _ArrayAdd($doors_y_end, $y)
+   next
 
    $room_count += 1
 endfunc
@@ -205,9 +259,23 @@ endfunc
 
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+func distance($d1, $d2, $d3, $d4)
+   $a = Abs($d1 - $d2)
+   $b = Abs($d3 - $d4)
+   return Sqrt(($a * $a) + ($b * $b))
+endfunc
+
 
 func assert($expression)
-   if not $expression then $bad = true
+   if not $expression then
+	  $bad = true
+	  say("assert failed")
+   endif
 endfunc
 
 
@@ -220,6 +288,66 @@ func print()
    msgbox(1,"number of rooms", $room_count)
    msgbox(1,"map", _ArrayToString($world, ""))
 endfunc
+
+
+func fill($what, $with)
+   for $y = 0 to ($world_height - 1)
+   for $x = 0 to ($world_width  - 1)
+	  $world[$y][$x] = ($world[$y][$x] = $what) ? $with : $world[$y][$x]
+   next
+   next
+endfunc
+
+
+func image()
+   local $path = @ScriptDir & "\" & $name & ".bpm"
+   local $file = fileopen($path, 10)
+   local $header  = "P1" & @CRLF & $world_width & " " & $world_height & @CRLF
+   local $body = ""
+   local $human_readable = "#"
+
+   for $y = 0 to ($world_height - 1)
+	  $human_readable = $human_readable & @CRLF & "#"
+	  $body = $body & @CRLF
+   for $x = 0 to ($world_width  - 1)
+	  ;$body = $body & $world[$y][$x] & " "
+	  if $world[$y][$x] = $tile_floor then $human_readable = $human_readable & "  "
+	  if $world[$y][$x] = $tile_door then $human_readable = $human_readable  & "▒▒"
+	  if $world[$y][$x] = $tile_empty then $human_readable = $human_readable  & "▓▓"
+	  if $world[$y][$x] = $tile_hall then $human_readable = $human_readable  & "▓▓"
+
+	  if $world[$y][$x] = $tile_floor then $body = $body  & "1 "
+	  if $world[$y][$x] = $tile_door then $body = $body  & "1 "
+	  if $world[$y][$x] = $tile_empty then $body = $body  & "0 "
+	  if $world[$y][$x] = $tile_hall then $body = $body  & "1 "
+   next
+   next
+
+   FileWrite($file, $header & $human_readable & $body)
+   FileClose($file)
+
+endfunc
+
+
+func logger($data)
+   FileWriteLine($logfile, $data)
+endfunc
+
+
+func say($message)
+   msgbox(1, "", $message)
+endfunc
+
+
+
+
+
+
+
+
+
+
+
 
 
 
