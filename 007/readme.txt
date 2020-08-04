@@ -11,5 +11,6 @@ dungeon_gen_7
   
   there is a serious problem for worlds above 300x300 taking forever to finish. the chances of a room being randomly placed within
   range of another room, when the world is huge, make the output very barren. the majority of time seems to be spent producing the
-  bitmap, because it creates the blank output file within a few seconds and then starts iterating through the world array. i think setting the array to itself + some chars becomes costly as the array grows large. maybe it cheaper to just build
-  each line, then print that, instead of building one massive string
+  bitmap, because it creates the blank output file within a few seconds and then starts iterating through the world array. i think
+  setting the array to itself + some chars becomes costly as the array grows large. maybe it cheaper to just build each line, then
+  print that, instead of building one massive string
