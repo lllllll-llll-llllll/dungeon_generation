@@ -14,3 +14,10 @@ dungeon_gen_7
   bitmap, because it creates the blank output file within a few seconds and then starts iterating through the world array. i think
   setting the array to itself + some chars becomes costly as the array grows large. maybe it cheaper to just build each line, then
   print that, instead of building one massive string
+
+
+other things i've noticed
+  border_limit when set high slows it down a lot
+  max_fails doesn't really increase the time, while producing much denser rooms
+  max_fails produces denser rooms but you need to keep raising it exponentially it feels like for the effects to matter
+  max_distance doesnt really slow it down, but it produces sparse output when too low and requires a large max_fails to become dense
